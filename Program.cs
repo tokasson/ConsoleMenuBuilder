@@ -7,10 +7,11 @@ namespace ConsoleMenuBuilder
         static void Main(string[] args)
         {
             ConsoleMenuBuilder cmb = new ConsoleMenuBuilder();
-            if (cmb.AddMenu("main", "my own header for main")) Console.WriteLine("Successfully added main!");
+            cmb.AddMenu("main", "main menu");
+            cmb.AddMenu("addnew", "main menu > add new entry to something");
 
-            Console.WriteLine(cmb.HeaderDivider);
             Console.WriteLine(cmb.GetMenu("main"));
+            Console.WriteLine(cmb.GetMenu("addnew"));
         }
     }
 }

@@ -42,7 +42,6 @@ namespace ConsoleMenuBuilder
             if (!_menuCollection.ContainsKey(menuName)) {
                 headerText = headerText == "" ? menuName.ToUpper() : headerText.ToUpper();
                 _menuCollection.Add(menuName, new Menu(headerText));
-                Console.WriteLine(menuName + " added: " + _menuCollection["main"].HeaderText);
             } else {
                 return false;
             }
