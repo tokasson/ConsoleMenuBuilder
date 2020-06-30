@@ -64,7 +64,13 @@ namespace ConsoleMenuBuilder
         }
 
         // methods
-        public bool AddMenuItem() {
+        public bool AddMenuItem(string menuName, int itemID) {
+            // exit adding if menu not existing
+            if (!_menuCollection.ContainsKey(menuName)) return false;
+            
+            // add item
+
+
             return true;
         }
         public int Count() {
@@ -75,6 +81,12 @@ namespace ConsoleMenuBuilder
     class Menu
     {
         private string _headerText = "NO TEXT SET YET";
+        
+        private Dictionary<int, MenuItems> _items = new Dictionary<int, MenuItems>();
+        public string GetItem(int id) {
+            return _items[id];
+        }
+
         public string HeaderText { 
             get => _headerText; 
             set => _headerText = value; 
@@ -82,5 +94,10 @@ namespace ConsoleMenuBuilder
         public Menu(string headerText) {
             _headerText = headerText;
         }
+    }
+
+    class MenuItems
+    {
+        
     }
 }
