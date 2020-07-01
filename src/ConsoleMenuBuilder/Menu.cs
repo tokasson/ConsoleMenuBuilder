@@ -3,10 +3,16 @@ using System.Collections.Generic;
 
 namespace ConsoleMenuBuilder
 {
-    class Menu
+    class Menu : IMenu
     {
-        private string _headerText = "(NO HEADER TEXT DEFINED)";
-        
+        //private string _headerText = "(NO HEADER TEXT DEFINED)";
+        public string HeaderText {
+            get => HeaderText;
+            set {
+                HeaderText = value == "" ? "(no header set)" : value;
+            }
+        }
+
         private Dictionary<string, MenuItems> _items = new Dictionary<string, MenuItems>();
         public Dictionary<string, MenuItems> Items {
             get => _items;
@@ -25,12 +31,15 @@ namespace ConsoleMenuBuilder
             return _items[id].ItemText;
         }
 
+        /*
         public string HeaderText { 
             get => _headerText; 
             set => _headerText = value; 
-        }       
+        } 
+        */
+
         public Menu(string headerText) {
-            _headerText = headerText;
+            HeaderText = headerText;
         }
     }
 }

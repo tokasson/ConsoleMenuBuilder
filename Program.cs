@@ -6,6 +6,11 @@ namespace ConsoleMenuBuilder
     {
         static void Main(string[] args)
         {
+            TestInterface x = new TestInterface();
+            
+            x.Run();
+
+            /*
             // create new instance of menu builder
             ConsoleMenuBuilder cmb = new ConsoleMenuBuilder();
 
@@ -36,6 +41,7 @@ namespace ConsoleMenuBuilder
                 userChoice = cmb.GetMenu(currentMenu);
                 switch (currentMenu) {
                     case "main":
+                        
                         break;
                     case "settings":
                         break;
@@ -43,6 +49,7 @@ namespace ConsoleMenuBuilder
                         break;
                 }
             }
+            */
         }
     }
 }
