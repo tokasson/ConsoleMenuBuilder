@@ -38,6 +38,7 @@ namespace ConsoleMenuBuilder
 
         // MENU DICTIONARY
         private Dictionary<string, Menu> _menuCollection = new Dictionary<string, Menu>();
+        
         public bool AddMenu(string menuName, string headerText = "") {
             if (!_menuCollection.ContainsKey(menuName)) {
                 headerText = headerText == "" ? menuName.ToUpper() : headerText.ToUpper();
@@ -48,14 +49,29 @@ namespace ConsoleMenuBuilder
             return true;
         }
         public string GetMenu(string menuName) {
+            // create header
             string headerTitleStart = HeaderDividerSymbol + " " + _menuCollection[menuName].HeaderText;
             string headerTitleEnd = new string(' ', _headerCharacterWidth - headerTitleStart.Length - 1) + _headerDividerSymbol;
             string menuFullText = HeaderDivider + "\n"
                 + HeaderDividerSpace + "\n"
                 + headerTitleStart + headerTitleEnd + "\n"
                 + HeaderDividerSpace + "\n"
-                + HeaderDivider;
-            return menuFullText;
+                + HeaderDivider + "\n\n";
+
+            // fill up with items (menu entries)
+            foreach (string id in _menuCollection[menuName].Items.Keys) {
+                menuFullText += _menuCollection[menuName].Items[id].ItemText + "\n";
+            }
+
+            // check if items exist and return depending on existence
+            if (_menuCollection[menuName].Items.Count > 0) {
+                // print menu and wait for user input
+                Console.WriteLine(menuFullText);
+                return Console.ReadLine();
+            } else {
+                Console.WriteLine(menuFullText);
+                return "";
+            }
         }
 
         // constructors
@@ -64,15 +80,49 @@ namespace ConsoleMenuBuilder
         }
 
         // methods
-        public bool AddMenuItem(string menuName, int itemID) {
+        public bool AddMenuItem(string menuName, string itemID, string itemText = "") {
             // exit adding if menu not existing
             if (!_menuCollection.ContainsKey(menuName)) return false;
             
             // add item
-
+            _menuCollection[menuName].AddItem(itemID, itemText);
+            _menuEntryCount = _menuCollection.Count;
 
             return true;
         }
+
+        /// <summary>
+        ///     Will change Id and/or ItemText for given Item ID.
+        ///     <param="newText">Set to null if no change to be made</param>
+        ///     <param="newId">Set to null if no change to be made</param>
+        /// </summary>
+        public bool ChangeMenuItem(string menuName, string currentId, string newText = null, string newId = null) {
+            if (!_menuCollection.ContainsKey(menuName)) return false;
+            if (!_menuCollection[menuName].Items.ContainsKey(currentId)) return false;
+            
+            // change ID
+            if (newId != null) {
+                // overwrite current Id property
+                _menuCollection[menuName].Items[currentId].Id = newId;
+                
+                // add key to a temp dictionary
+                Dictionary<string, MenuItems> tempDict = new Dictionary<string, MenuItems>();
+                tempDict.Add(newId, _menuCollection[menuName].Items[currentId]);
+                
+                // remove key from original dictionary and add the temp entry
+                _menuCollection[menuName].Items.Remove(currentId);
+                _menuCollection[menuName].Items.Add(newId, tempDict[newId]);
+
+                // change currentId to newId for rest of method
+                currentId = newId;
+            }
+            
+            // change ItemText
+            if (newText != null) _menuCollection[menuName].Items[currentId].ItemText = newText;
+
+            return true;
+        }
+
         public int Count() {
             return _menuEntryCount;
         }
@@ -80,11 +130,24 @@ namespace ConsoleMenuBuilder
 
     class Menu
     {
-        private string _headerText = "NO TEXT SET YET";
+        private string _headerText = "(NO HEADER TEXT DEFINED)";
         
-        private Dictionary<int, MenuItems> _items = new Dictionary<int, MenuItems>();
-        public string GetItem(int id) {
-            return _items[id];
+        private Dictionary<string, MenuItems> _items = new Dictionary<string, MenuItems>();
+        public Dictionary<string, MenuItems> Items {
+            get => _items;
+        }
+
+        public bool AddItem(string id, string itemText = "") {
+            if (id == "") return false;
+            _items.Add(id, new MenuItems(id));            
+            if (itemText != "") {
+               _items[id].ItemText = itemText;     
+            }            
+            return true;
+        }
+
+        public string GetItem(string id) {
+            return _items[id].ItemText;
         }
 
         public string HeaderText { 
@@ -98,6 +161,20 @@ namespace ConsoleMenuBuilder
 
     class MenuItems
     {
-        
+        private string _id;
+        public string Id {
+            get => _id;
+            set => _id = value;
+        }
+        public MenuItems(string id) {
+            // id can be set by user and will reflect the "choice letter/number" from the menu
+            Id = id;
+        }
+
+        private string _itemText = "(item text is not defined)";
+        public string ItemText {
+            get => $"{_id}. {_itemText}";
+            set => _itemText = value;
+        }
     }
 }
