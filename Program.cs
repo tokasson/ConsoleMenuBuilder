@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ConsoleMenu;
+using System;
+using System.Collections.Generic;
 
 namespace ConsoleMenuBuilder
 {
@@ -6,9 +8,20 @@ namespace ConsoleMenuBuilder
     {
         static void Main(string[] args)
         {
-            TestInterface x = new TestInterface();
+            IMenuControl menuList = new MenuControl();
+
+            menuList.AddMenu(null, "main");
+            menuList.GetMenu("main").HeaderTitle = "This is my header";
             
-            x.Run();
+            menuList.AddMenu(menuList.GetMenu("main"), "sub1");
+            menuList.GetMenu("sub1").HeaderTitle = "This is SUB1";
+
+            menuList.AddMenu(menuList.GetMenu("sub1"), "sub1sub1");
+            menuList.GetMenu("sub1sub1").HeaderTitle = "This is SUB1 below SUB1";
+
+
+            Console.WriteLine(menuList.GetMenu("sub1").GetHeader());
+            Console.WriteLine(menuList.GetMenu("sub1sub1").MenuParent);
 
             /*
             // create new instance of menu builder

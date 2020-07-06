@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ConsoleMenuBuilder
 {
-    class Menu : IMenu
+    class OLD_Menu
     {
         //private string _headerText = "(NO HEADER TEXT DEFINED)";
         public string HeaderText {
@@ -38,7 +38,7 @@ namespace ConsoleMenuBuilder
         } 
         */
 
-        public Menu(string headerText) {
+        public OLD_Menu(string headerText) {
             HeaderText = headerText;
         }
     }

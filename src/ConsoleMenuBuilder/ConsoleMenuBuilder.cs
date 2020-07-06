@@ -37,12 +37,12 @@ namespace ConsoleMenuBuilder
         }
 
         // MENU DICTIONARY
-        private Dictionary<string, Menu> _menuCollection = new Dictionary<string, Menu>();
+        private Dictionary<string, OLD_Menu> _menuCollection = new Dictionary<string, OLD_Menu>();
         
         public bool AddMenu(string menuName, string headerText = "") {
             if (!_menuCollection.ContainsKey(menuName)) {
                 headerText = headerText == "" ? menuName.ToUpper() : headerText.ToUpper();
-                _menuCollection.Add(menuName, new Menu(headerText));
+                _menuCollection.Add(menuName, new OLD_Menu(headerText));
             } else {
                 return false;
             }
