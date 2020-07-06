@@ -9,19 +9,40 @@ namespace ConsoleMenuBuilder
         static void Main(string[] args)
         {
             IMenuControl menuList = new MenuControl();
+            IMenu m;
 
             menuList.AddMenu(null, "main");
             menuList.GetMenu("main").HeaderTitle = "This is my header";
-            
+            menuList.GetMenu("main").AddMenuItem("Exit this");
+            menuList.GetMenu("main").GetMenuItem("main_1").MenuName = "FULL_EXIT";
+
             menuList.AddMenu(menuList.GetMenu("main"), "sub1");
             menuList.GetMenu("sub1").HeaderTitle = "This is SUB1";
 
             menuList.AddMenu(menuList.GetMenu("sub1"), "sub1sub1");
-            menuList.GetMenu("sub1sub1").HeaderTitle = "This is SUB1 below SUB1";
+            m = menuList.GetMenu("sub1sub1");
+            m.HeaderTitle = "This is SUB1 below SUB1";
+            m.UseNamesAsHeader = true;
+            m.AddMenuItem("I am Text 1");
+            m.AddMenuItem("I am Text 2");
+            m.AddMenuItem("I am Text 3");
 
-
-            Console.WriteLine(menuList.GetMenu("sub1").GetHeader());
-            Console.WriteLine(menuList.GetMenu("sub1sub1").MenuParent);
+            m.GetMenuItem("sub1sub1_1").MenuName = "main";
+            
+            bool exitConsole = false;
+            string currentMenu = "sub1sub1";
+            string chosenMenu = "";
+            while (exitConsole == false)
+            {
+                // run menu
+                chosenMenu = menuList.GetMenu(currentMenu).GetFullMenu();
+                
+                // check if exit was set
+                exitConsole = chosenMenu == "FULL_EXIT";
+                
+                // change menu choice
+                currentMenu = chosenMenu;
+            }
 
             /*
             // create new instance of menu builder

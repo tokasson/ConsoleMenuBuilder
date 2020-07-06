@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ConsoleMenu
 {
     public class Menu : IMenu
-    {
+    {        
         public bool HasHeader { get; private set; } = false;
         
         public char HeaderFrameChar { get; set; } = '#';
@@ -23,12 +23,16 @@ namespace ConsoleMenu
                 HasHeader = true;
             } 
         }
-        
+
+        public List<IMenuItem> MenuItems { get; set; } = new List<IMenuItem>();
+
         public string MenuParent { get; private set; } = "";
         
         public string Name { get; set; } = "main";
 
-        public string UseNamesAsHeader { get; set; } = false;
+        public bool ShowMenuPath { get; set; } = false;
+
+        public bool UseNamesAsHeader { get; set; } = false;
 
         public Menu() 
         {
@@ -42,10 +46,17 @@ namespace ConsoleMenu
             SetParent(parentMenu);
         }
 
+        public bool AddMenuItem(string itemText)
+        {
+            int countItems = MenuItems.Count;
+            MenuItems.Add(new MenuItem(Name + "_" + (countItems + 1).ToString(), itemText));
+            return countItems < MenuItems.Count;
+        }
+        
         public string BuildHeader()
         {
             string[] parentNames = MenuParent.Split('|');
-            string buildMenuPath = "(";
+            string buildMenuPath = "";
             if (parentNames.Length > 1)
             {
                 foreach (string parentName in parentNames)
@@ -54,13 +65,62 @@ namespace ConsoleMenu
                     buildMenuPath += parentName + " > ";
                 }
             }
-            buildMenuPath += Name + ")";
+            buildMenuPath += Name;
 
             string fullFrameLine = new string(HeaderFrameChar, HeaderFrameCharCount) + "\n";
             string frameLineSpace = HeaderFrameChar + new string(' ', HeaderFrameCharCount - 2) + HeaderFrameChar + "\n";
             string framedHeaderText = HeaderFrameChar + " " + HeaderTitle + new string(' ', HeaderFrameCharCount - HeaderTitle.Length - 3) + HeaderFrameChar + "\n";
-            string framedHeaderMenuPath = HeaderFrameChar + " " + buildMenuPath + new string(' ', HeaderFrameCharCount - buildMenuPath.Length - 3) + HeaderFrameChar + "\n";
-            return fullFrameLine + frameLineSpace + framedHeaderText + framedHeaderMenuPath + frameLineSpace + fullFrameLine;
+            string fullHeader;
+
+            if (UseNamesAsHeader)
+            {
+                string framedNames = HeaderFrameChar + " " + buildMenuPath.ToUpper() + new string(' ', HeaderFrameCharCount - buildMenuPath.Length - 3) + HeaderFrameChar + "\n";
+                fullHeader = fullFrameLine + frameLineSpace + framedNames + frameLineSpace + fullFrameLine;
+            }
+            else if (ShowMenuPath)
+            {
+                string framedHeaderMenuPath = HeaderFrameChar + " (" + buildMenuPath + ")" + new string(' ', HeaderFrameCharCount - buildMenuPath.Length - 5) + HeaderFrameChar + "\n";
+                fullHeader = fullFrameLine + frameLineSpace + framedHeaderText + framedHeaderMenuPath + frameLineSpace + fullFrameLine;
+            }
+            else
+            {
+                fullHeader = fullFrameLine + frameLineSpace + framedHeaderText + frameLineSpace + fullFrameLine;
+            }
+
+            return fullHeader;
+            
+        }
+
+        public string BuildItems()
+        {
+            string buildItems = "";
+            int index = 0;
+            foreach (IMenuItem menuItem in MenuItems)
+            {
+                buildItems += (++index).ToString() + ". " + menuItem.Text + "\n";
+            }
+            return buildItems;
+        }
+
+        public string GetFullMenu()
+        {
+            Console.Clear();
+            Console.WriteLine(GetHeader() + "\n" + GetItems() + "\n");
+            Console.Write("Enter choice: ");
+            
+            // get choice from user and check what was specified to be done
+            string choice = Console.ReadLine().ToString();
+            IMenuItem menuItem = GetMenuItem(Name + "_" + choice);
+            if (menuItem.CallMenu)
+            {
+                return menuItem.MenuName;
+            }
+            else
+            {
+                Console.WriteLine("Run whatever was specified: {0}", menuItem.RunName);
+                Console.ReadKey();
+                return menuItem.MenuName;
+            }
         }
 
         public string GetHeader()
@@ -69,10 +129,29 @@ namespace ConsoleMenu
             return "";
         }
 
+        public string GetItems()
+        {
+            return BuildItems();
+        }
+
+        public IMenuItem GetMenuItem(string itemName)
+        {
+            foreach (IMenuItem menuItem in MenuItems)
+            {
+                if (menuItem.Name == itemName)
+                {
+                    return menuItem;
+                }
+            }
+            return null;
+        }
+
         public void Reset()
         {
             HeaderTitle = "(no header set)";
             HasHeader = false;
+            ShowMenuPath = true;
+            UseNamesAsHeader = false;
         }
 
         public void SetParent(IMenu parentMenu)
@@ -86,42 +165,5 @@ namespace ConsoleMenu
                 MenuParent = parentMenu.MenuParent + "|" + parentMenu.Name;
             }
         }
-
-        /*
-        public string HeaderText {
-            get => HeaderText;
-            set {
-                HeaderText = value == "" ? "(no header set)" : value;
-            }
-        }
-
-        private Dictionary<string, MenuItems> _items = new Dictionary<string, MenuItems>();
-        public Dictionary<string, MenuItems> Items {
-            get => _items;
-        }
-
-        public bool AddItem(string id, string itemText = "") {
-            if (id == "") return false;
-            _items.Add(id, new MenuItems(id));            
-            if (itemText != "") {
-               _items[id].ItemText = itemText;     
-            }            
-            return true;
-        }
-
-        public string GetItem(string id) {
-            return _items[id].ItemText;
-        }
-
-        public string HeaderText { 
-            get => _headerText; 
-            set => _headerText = value; 
-        } 
-        
-
-        public Menu(string headerText) {
-            HeaderText = headerText;
-        }
-        */
     }
 }
